@@ -13,7 +13,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			token: null
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,6 +47,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			}, 
+			login: async (email, password) => {
+				try{
+					// fetching data from the backend
+					let opts = {
+						method: "POST",
+						headers: {
+						  "Content-Type": "application/json"
+						},
+						body: JSON.stringify({email: email, password: password})
+					  }
+					const resp = await fetch(process.env.BACKEND_URL + "/api/token", opts)
+					const data = await resp.json()
+
+					sessionStorage.setItem("token", data.access_token)
+					console.log("WOWOWOWOW")
+					setStore({ token: data.access_token })
+
+					// don't forget to return something, that is how the async resolves
+					return data;
+				}catch(error){
+					console.log("Error loading message from backend", error)
+				}
 			}
 		}
 	};
